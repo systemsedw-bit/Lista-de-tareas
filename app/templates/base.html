@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lista de Tareas{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand-block">
+                <div class="brand-icon">LT</div>
+                <div>
+                    <strong>Lista de Tareas</strong>
+                    <span>Dashboard académico</span>
+                </div>
+            </div>
+
+            <nav class="side-nav" aria-label="Navegación principal">
+                <a href="{{ url_for('index') }}" class="active">Dashboard</a>
+                <a href="{{ url_for('index', categoria='Universidad') }}">Universidad</a>
+                <a href="{{ url_for('index', categoria='Casa') }}">Casa</a>
+                <a href="{{ url_for('index', categoria='Trabajo') }}">Trabajo</a>
+            </nav>
+
+            <div class="sidebar-note">
+                <span>Proyecto</span>
+                <strong>Construcción de Software</strong>
+                <small>Python + Flask + SQLite</small>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Panel de productividad</p>
+                    <h1>{% block heading %}Gestiona tus tareas con claridad{% endblock %}</h1>
+                </div>
+                <div class="topbar-actions">
+                    <span class="status-pill">App web funcional</span>
+                    <span class="status-pill muted">pytest + Docker</span>
+                </div>
+            </header>
+
+            <main class="content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <section class="messages">
+                            {% for category, message in messages %}
+                                <div class="message {{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        </section>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="footer">
+                <p>Proyecto académico - Construcción de Software ASUC00947</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

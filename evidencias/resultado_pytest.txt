@@ -1,0 +1,8 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.2, pluggy-1.6.0
+rootdir: /mnt/data/lista_tareas_final/Lista-de-tareas
+collected 3 items
+
+tests/test_app.py ...                                                    [100%]
+
+============================== 3 passed in 0.22s ===============================

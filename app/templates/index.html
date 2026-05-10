@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Lista de Tareas{% endblock %}
+{% block heading %}Dashboard de tareas por Universidad, Casa y Trabajo{% endblock %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <article class="hero-card">
+        <div>
+            <p class="eyebrow">Resumen general</p>
+            <h2>Lista de Tareas</h2>
+            <p>Organiza tus pendientes universitarios, actividades del hogar y responsabilidades laborales desde un solo tablero.</p>
+        </div>
+        <div class="progress-ring" style="--progress: {{ progreso_general }};">
+            <strong>{{ progreso_general }}%</strong>
+            <span>avance</span>
+        </div>
+    </article>
+
+    <article class="metric-card">
+        <span>Total</span>
+        <strong>{{ total }}</strong>
+        <small>Tareas registradas</small>
+    </article>
+    <article class="metric-card warning">
+        <span>Pendientes</span>
+        <strong>{{ pendientes }}</strong>
+        <small>Por atender</small>
+    </article>
+    <article class="metric-card success">
+        <span>Completadas</span>
+        <strong>{{ completadas }}</strong>
+        <small>Finalizadas</small>
+    </article>
+    <article class="metric-card danger">
+        <span>Alta prioridad</span>
+        <strong>{{ alta_prioridad }}</strong>
+        <small>Pendientes críticas</small>
+    </article>
+</section>
+
+<section class="category-dashboard">
+    {% for item in resumen_categorias %}
+        <a class="category-card {{ item.nombre|lower }}" href="{{ url_for('index', categoria=item.nombre) }}">
+            <div class="category-card-header">
+                <span class="category-icon">
+                    {% if item.nombre == 'Universidad' %}🎓{% elif item.nombre == 'Casa' %}🏠{% else %}💼{% endif %}
+                </span>
+                <div>
+                    <h3>{{ item.nombre }}</h3>
+                    <p>{{ item.total }} tareas registradas</p>
+                </div>
+            </div>
+            <div class="mini-stats">
+                <span>{{ item.pendientes }} pendientes</span>
+                <span>{{ item.completadas }} completadas</span>
+            </div>
+            <div class="progress-bar" aria-label="Progreso de {{ item.nombre }}">
+                <span style="width: {{ item.progreso }}%"></span>
+            </div>
+            <small>{{ item.progreso }}% de avance</small>
+        </a>
+    {% endfor %}
+</section>
+
+<section class="workspace-grid">
+    <article class="panel form-panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Nuevo registro</p>
+                <h2>Agregar tarea</h2>
+                <p>Clasifica cada actividad según su contexto: universidad, casa o trabajo.</p>
+            </div>
+        </div>
+
+        <form class="task-form" action="{{ url_for('tareas.agregar') }}" method="post">
+            <div class="form-group wide">
+                <label for="titulo">Título de la tarea</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Ej.: Avanzar informe final" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="categoria">Lista</label>
+                    <select id="categoria" name="categoria">
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}">{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="prioridad">Prioridad</label>
+                    <select id="prioridad" name="prioridad">
+                        {% for prioridad in prioridades %}
+                            <option value="{{ prioridad }}" {% if prioridad == 'Media' %}selected{% endif %}>{{ prioridad }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group wide">
+                <label for="fecha_limite">Fecha límite</label>
+                <input type="date" id="fecha_limite" name="fecha_limite">
+            </div>
+
+            <div class="form-group wide">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" placeholder="Agrega una descripción breve para entender mejor la tarea"></textarea>
+            </div>
+
+            <button type="submit" class="btn primary full">Agregar tarea</button>
+        </form>
+    </article>
+
+    <article class="panel filters-panel">
+        <div class="panel-header compact-header">
+            <div>
+                <p class="eyebrow">Control rápido</p>
+                <h2>Filtros</h2>
+            </div>
+            <a class="btn soft" href="{{ url_for('index') }}">Limpiar</a>
+        </div>
+
+        <form method="get" class="filter-form">
+            <div class="form-group wide">
+                <label for="q">Buscar tarea</label>
+                <input type="search" id="q" name="q" value="{{ busqueda }}" placeholder="Buscar por título o descripción">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="categoriaFiltro">Lista</label>
+                    <select id="categoriaFiltro" name="categoria">
+                        <option value="Todas" {% if filtro_categoria == 'Todas' %}selected{% endif %}>Todas</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}" {% if filtro_categoria == categoria %}selected{% endif %}>{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="estadoFiltro">Estado</label>
+                    <select id="estadoFiltro" name="estado">
+                        <option value="Todas" {% if filtro_estado == 'Todas' %}selected{% endif %}>Todas</option>
+                        <option value="Pendiente" {% if filtro_estado == 'Pendiente' %}selected{% endif %}>Pendientes</option>
+                        <option value="Completada" {% if filtro_estado == 'Completada' %}selected{% endif %}>Completadas</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn primary full" type="submit">Aplicar filtros</button>
+        </form>
+    </article>
+</section>
+
+<section class="panel board-panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Tablero principal</p>
+            <h2>Tareas organizadas por lista</h2>
+            <p>Vista tipo dashboard para separar actividades de universidad, casa y trabajo.</p>
+        </div>
+        <span class="results-pill">{{ tareas|length }} resultados visibles</span>
+    </div>
+
+    <div class="board-columns">
+        {% for categoria in categorias %}
+            <section class="task-column {{ categoria|lower }}">
+                <div class="column-title">
+                    <div>
+                        <span class="category-icon small">
+                            {% if categoria == 'Universidad' %}🎓{% elif categoria == 'Casa' %}🏠{% else %}💼{% endif %}
+                        </span>
+                        <h3>{{ categoria }}</h3>
+                    </div>
+                    <span>{{ tareas_por_categoria[categoria]|length }}</span>
+                </div>
+
+                {% if tareas_por_categoria[categoria] %}
+                    <div class="task-list">
+                        {% for tarea in tareas_por_categoria[categoria] %}
+                            <article class="task-card {{ 'done' if tarea['estado'] == 'Completada' else '' }}" data-title="{{ tarea['titulo']|lower }} {{ tarea['descripcion']|lower }}">
+                                <div class="task-title-row">
+                                    <h4>{{ tarea['titulo'] }}</h4>
+                                    <span class="priority {{ tarea['prioridad']|lower }}">{{ tarea['prioridad'] }}</span>
+                                </div>
+                                <p>{{ tarea['descripcion'] or 'Sin descripción adicional.' }}</p>
+                                <div class="task-meta">
+                                    <span class="state {{ tarea['estado']|lower }}">{{ tarea['estado'] }}</span>
+                                    {% if tarea['fecha_limite'] %}<span>Vence: {{ tarea['fecha_limite'] }}</span>{% endif %}
+                                </div>
+                                <div class="task-actions">
+                                    <form action="{{ url_for('tareas.completar', tarea_id=tarea['id']) }}" method="post">
+                                        <button class="btn soft" type="submit">
+                                            {{ 'Reabrir' if tarea['estado'] == 'Completada' else 'Completar' }}
+                                        </button>
+                                    </form>
+                                    <a class="btn soft" href="{{ url_for('tareas.editar', tarea_id=tarea['id']) }}">Editar</a>
+                                    <form action="{{ url_for('tareas.eliminar', tarea_id=tarea['id']) }}" method="post" class="delete-form">
+                                        <button class="btn danger" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small-empty">
+                        <strong>Sin tareas visibles</strong>
+                        <p>Agrega una tarea o limpia los filtros.</p>
+                    </div>
+                {% endif %}
+            </section>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

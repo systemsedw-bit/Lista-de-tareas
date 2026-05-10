@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Editar tarea - Lista de Tareas{% endblock %}
+{% block heading %}Editar tarea registrada{% endblock %}
+
+{% block content %}
+<section class="panel compact edit-panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Actualización</p>
+            <h2>Editar tarea</h2>
+            <p>Modifica la información y vuelve al dashboard principal.</p>
+        </div>
+        <a class="btn soft" href="{{ url_for('index') }}">Volver al dashboard</a>
+    </div>
+
+    <form class="task-form" method="post">
+        <div class="form-group wide">
+            <label for="titulo">Título</label>
+            <input type="text" id="titulo" name="titulo" value="{{ tarea['titulo'] }}" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="categoria">Lista</label>
+                <select id="categoria" name="categoria">
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria }}" {% if tarea['categoria'] == categoria %}selected{% endif %}>{{ categoria }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prioridad">Prioridad</label>
+                <select id="prioridad" name="prioridad">
+                    {% for prioridad in prioridades %}
+                        <option value="{{ prioridad }}" {% if tarea['prioridad'] == prioridad %}selected{% endif %}>{{ prioridad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group wide">
+            <label for="fecha_limite">Fecha límite</label>
+            <input type="date" id="fecha_limite" name="fecha_limite" value="{{ tarea['fecha_limite'] }}">
+        </div>
+
+        <div class="form-group wide">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion">{{ tarea['descripcion'] }}</textarea>
+        </div>
+
+        <button type="submit" class="btn primary full">Guardar cambios</button>
+    </form>
+</section>
+{% endblock %}
